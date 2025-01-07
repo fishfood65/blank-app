@@ -66,20 +66,23 @@ def display_bingo_board(board, completed_data):
 # Call the function to display the Bingo board
 display_bingo_board(bingo_board, completed_data)
 
-# Detect when a cell is clicked and prompt for user input
+# Form submission logic
 if 'cell_clicked' in st.session_state:
     clicked_cell = st.session_state.cell_clicked
     task_name, col, row = clicked_cell.split("_")
     
-    # Prompt user to enter details
-    user_input = st.text_input(f"Enter details for '{task_name}'", key="input_text")
-    if st.button("Submit"):
-        # Save the task as completed with the user input
-        if user_input:
-            completed_data.append({"task_id": clicked_cell, "task_name": task_name, "data": user_input})
-            st.session_state.cell_clicked = None
-            st.success(f"Task '{task_name}' completed!")
-            st.experimental_rerun()  # Re-run to update the board
+    # Display form to enter task details
+    with st.form(key='task_input_form'):
+        user_input = st.text_input(f"Enter details for '{task_name}'")
+        submit_button = st.form_submit_button(label="Submit")
+        
+        if submit_button:
+            if user_input:
+                # Save the task as completed with the user input
+                completed_data.append({"task_id": clicked_cell, "task_name": task_name, "data": user_input})
+                st.session_state.cell_clicked = None  # Clear the clicked task
+                st.success(f"Task '{task_name}' completed!")
+                st.experimental_rerun()  # Re-run to update the board
 
 # Save the completed tasks to a CSV file
 def save_data_to_csv(completed_data):
